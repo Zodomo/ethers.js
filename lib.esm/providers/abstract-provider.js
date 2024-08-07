@@ -23,6 +23,7 @@ import { formatBlock, formatLog, formatTransactionReceipt, formatTransactionResp
 import { Network } from "./network.js";
 import { copyRequest, Block, FeeData, Log, TransactionReceipt, TransactionResponse } from "./provider.js";
 import { PollingBlockSubscriber, PollingBlockTagSubscriber, PollingEventSubscriber, PollingOrphanSubscriber, PollingTransactionSubscriber } from "./subscriber-polling.js";
+import { ClustersResolver } from "./clusters-resolver.js";
 // Constants
 const BN_2 = BigInt(2);
 const MAX_CCIP_REDIRECTS = 10;
@@ -825,6 +826,8 @@ export class AbstractProvider {
         });
     }
     async getResolver(name) {
+        if (name.includes('/') || !name.includes('.'))
+            return await ClustersResolver.getResolver(this, name);
         return await EnsResolver.fromName(this, name);
     }
     async getAvatar(name) {
@@ -844,6 +847,15 @@ export class AbstractProvider {
     async lookupAddress(address) {
         address = getAddress(address);
         const node = namehash(address.substring(2).toLowerCase() + ".addr.reverse");
+        try {
+            const resolver = await ClustersResolver.getResolver(this, '');
+            const name = await resolver.getName(address);
+            if (name !== null)
+                return name;
+        }
+        catch (error) {
+            console.log(`Error looking up address using Clusters: ${error}`);
+        }
         try {
             const ensAddr = await EnsResolver.getEnsAddress(this);
             const ensContract = new Contract(ensAddr, [

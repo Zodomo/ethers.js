@@ -15,6 +15,7 @@ import type { Listener } from "../utils/index.js";
 import type { Networkish } from "./network.js";
 import type { BlockParams, LogParams, TransactionReceiptParams, TransactionResponseParams } from "./formatting.js";
 import type { BlockTag, EventFilter, Filter, FilterByBlockHash, OrphanFilter, PreparedTransactionRequest, Provider, ProviderEvent, TransactionRequest } from "./provider.js";
+import { ClustersResolver } from "./clusters-resolver.js";
 /**
  *  The types of additional event values that can be emitted for the
  *  ``"debug"`` event.
@@ -362,7 +363,7 @@ export declare class AbstractProvider implements Provider {
     getTransactionResult(hash: string): Promise<null | string>;
     getLogs(_filter: Filter | FilterByBlockHash): Promise<Array<Log>>;
     _getProvider(chainId: number): AbstractProvider;
-    getResolver(name: string): Promise<null | EnsResolver>;
+    getResolver(name: string): Promise<null | EnsResolver | ClustersResolver>;
     getAvatar(name: string): Promise<null | string>;
     resolveName(name: string): Promise<null | string>;
     lookupAddress(address: string): Promise<null | string>;

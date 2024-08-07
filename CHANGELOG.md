@@ -3,6 +3,12 @@ Change Log
 
 This change log is maintained by `src.ts/_admin/update-changelog.ts` but may also be manually updated.
 
+ethers/v6.13.3 (2024-08-07 15:35)
+---------------------------------
+
+  - touch ups and added Clusters to getAvatar ([ce638eb](https://github.com/ethers-io/ethers.js/commit/ce638eb365db70115472a1b416fd45138c3456de)).
+  - added Clusters provider to perform name resolution and reverse address lookups ([24e63ea](https://github.com/ethers-io/ethers.js/commit/24e63eab3ba068f11842f47f60febc336af29e56)).
+
 ethers/v6.13.2 (2024-07-25 17:54)
 ---------------------------------
 

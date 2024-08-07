@@ -26,6 +26,7 @@ const format_js_1 = require("./format.js");
 const network_js_1 = require("./network.js");
 const provider_js_1 = require("./provider.js");
 const subscriber_polling_js_1 = require("./subscriber-polling.js");
+const clusters_resolver_js_1 = require("./clusters-resolver.js");
 // Constants
 const BN_2 = BigInt(2);
 const MAX_CCIP_REDIRECTS = 10;
@@ -829,6 +830,8 @@ class AbstractProvider {
         });
     }
     async getResolver(name) {
+        if (name.includes('/') || !name.includes('.'))
+            return await clusters_resolver_js_1.ClustersResolver.getResolver(this, name);
         return await ens_resolver_js_1.EnsResolver.fromName(this, name);
     }
     async getAvatar(name) {
@@ -848,6 +851,15 @@ class AbstractProvider {
     async lookupAddress(address) {
         address = (0, index_js_1.getAddress)(address);
         const node = (0, index_js_4.namehash)(address.substring(2).toLowerCase() + ".addr.reverse");
+        try {
+            const resolver = await clusters_resolver_js_1.ClustersResolver.getResolver(this, '');
+            const name = await resolver.getName(address);
+            if (name !== null)
+                return name;
+        }
+        catch (error) {
+            console.log(`Error looking up address using Clusters: ${error}`);
+        }
         try {
             const ensAddr = await ens_resolver_js_1.EnsResolver.getEnsAddress(this);
             const ensContract = new index_js_3.Contract(ensAddr, [

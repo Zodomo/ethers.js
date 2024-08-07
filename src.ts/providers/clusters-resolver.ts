@@ -8,6 +8,14 @@ import { defineProperties } from "../utils/index.js";
 
 import type { AbstractProvider } from "./abstract-provider.js";
 
+declare type Response = {
+  ok: boolean;
+  status: number;
+  json(): Promise<any>;
+};
+
+declare function fetch(url: string): Promise<Response>;
+
 /**
  *  A Clusters domain name resolver.
  */
@@ -16,6 +24,12 @@ export class ClustersResolver {
    *  The connected provider.
    */
   provider!: AbstractProvider;
+
+  /**
+   *  The address of the resolver. (UNUSED)
+   *  Overridden to return true and calm compiler complaints.
+   */
+  address!: string;
 
   /**
    *  The name this resolver was resolved against.
@@ -98,7 +112,7 @@ export class ClustersResolver {
       );
 
       // Sort addresses in alphanumeric ascending order
-      return addresses.sort((a, b) =>
+      return addresses.sort((a: string, b: string) =>
         a.toLowerCase().localeCompare(b.toLowerCase())
       );
     } catch (error) {
@@ -144,5 +158,12 @@ export class ClustersResolver {
     name: string
   ): Promise<ClustersResolver> {
     return new ClustersResolver(provider, name);
+  }
+
+  /**
+   *  Overridden to return true and calm compiler complaints.
+   */
+  async supportsWildcard(): Promise<boolean> {
+    return true;
   }
 }
