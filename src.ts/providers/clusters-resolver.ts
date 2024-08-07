@@ -32,18 +32,18 @@ export class ClustersResolver {
   async getAddress(): Promise<null | string> {
     try {
       const response = await fetch(
-        `https://api.clusters.xyz/v0.1/address/${this.name}`,
+        `https://api.clusters.xyz/v0.1/address/${this.name}`
       );
-    
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-    
+
       const data = await response.json();
       if (data == null) return null;
       return getAddress(data.address);
     } catch (error) {
-      console.error('There was a problem fetching the address:', error);
+      console.error("There was a problem fetching the address:", error);
       throw error;
     }
   }
@@ -55,17 +55,17 @@ export class ClustersResolver {
     try {
       address = getAddress(address);
       const response = await fetch(
-        `https://api.clusters.xyz/v0.1/name/${address}`,
+        `https://api.clusters.xyz/v0.1/name/${address}`
       );
-    
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-    
+
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error('There was a problem fetching the name:', error);
+      console.error("There was a problem fetching the name:", error);
       throw error;
     }
   }
@@ -75,31 +75,62 @@ export class ClustersResolver {
    */
   async getCluster(): Promise<null | string[]> {
     try {
-      const delimiterIndex = this.name.indexOf('/');
-      const cluster = delimiterIndex === -1 ? this.name : this.name.substring(0, delimiterIndex);
+      const delimiterIndex = this.name.indexOf("/");
+      const cluster =
+        delimiterIndex === -1
+          ? this.name
+          : this.name.substring(0, delimiterIndex);
 
       const response = await fetch(
-        `https://api.clusters.xyz/v0.1/cluster/${cluster}`,
+        `https://api.clusters.xyz/v0.1/cluster/${cluster}`
       );
-    
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-    
+
       const data = await response.json();
       if (data == null) return null;
-    
+
       // Extract addresses from the wallets array
-      const addresses = data.wallets.map(
-        (wallet: { address: string }) => getAddress(wallet.address),
+      const addresses = data.wallets.map((wallet: { address: string }) =>
+        getAddress(wallet.address)
       );
-    
+
       // Sort addresses in alphanumeric ascending order
       return addresses.sort((a, b) =>
-        a.toLowerCase().localeCompare(b.toLowerCase()),
+        a.toLowerCase().localeCompare(b.toLowerCase())
       );
     } catch (error) {
-      console.error('There was a problem fetching the address:', error);
+      console.error("There was a problem fetching the address:", error);
+      throw error;
+    }
+  }
+
+  /**
+   *  Resolves to the avatar url or ``null``.
+   */
+  async getAvatar(): Promise<null | string> {
+    try {
+      const delimiterIndex = this.name.indexOf("/");
+      const cluster =
+        delimiterIndex === -1
+          ? this.name
+          : this.name.substring(0, delimiterIndex);
+
+      const response = await fetch(
+        `https://api.clusters.xyz/v0.1/cluster/${cluster}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data == null) return null;
+      return data.imageUrl;
+    } catch (error) {
+      console.error("There was a problem fetching the Cluster avatar:", error);
       throw error;
     }
   }
@@ -108,7 +139,10 @@ export class ClustersResolver {
    *  Resolve to the Clusters resolver for %%name%% using %%provider%% or
    *  ``null`` if unconfigured.
    */
-  static async fromName(provider: AbstractProvider, name: string): Promise<ClustersResolver> {
+  static async getResolver(
+    provider: AbstractProvider,
+    name: string
+  ): Promise<ClustersResolver> {
     return new ClustersResolver(provider, name);
   }
 }
