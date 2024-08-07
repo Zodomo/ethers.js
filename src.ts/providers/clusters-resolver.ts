@@ -28,6 +28,7 @@ export class ClustersResolver {
   /**
    *  The address of the resolver. (UNUSED)
    *  Overridden to return true and calm compiler complaints.
+   *  NOTE: We do NOT need this value, building just isn't successful without it.
    */
   address!: string;
 
@@ -150,8 +151,7 @@ export class ClustersResolver {
   }
 
   /**
-   *  Resolve to the Clusters resolver for %%name%% using %%provider%% or
-   *  ``null`` if unconfigured.
+   *  Retrieves the ClustersResolver.
    */
   static async getResolver(
     provider: AbstractProvider,
@@ -162,6 +162,7 @@ export class ClustersResolver {
 
   /**
    *  Overridden to return true and calm compiler complaints.
+   *  NOTE: We do NOT need this function, building just isn't successful without it.
    */
   async supportsWildcard(): Promise<boolean> {
     return true;

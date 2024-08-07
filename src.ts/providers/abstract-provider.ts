@@ -1180,6 +1180,7 @@ export class AbstractProvider implements Provider {
     }
 
     async getResolver(name: string): Promise<null | EnsResolver | ClustersResolver> {
+        // If name includes '/' or excludes '.', resolve using Clusters instead of ENS.
         if (name.includes('/') || !name.includes('.')) return await ClustersResolver.getResolver(this, name);
         return await EnsResolver.fromName(this, name);
     }
@@ -1200,6 +1201,7 @@ export class AbstractProvider implements Provider {
         address = getAddress(address);
         const node = namehash(address.substring(2).toLowerCase() + ".addr.reverse");
 
+        // Attempt reverse lookup using Clusters first. Fallback to ENS if none found.
         try {
             const resolver = await ClustersResolver.getResolver(this, '');
             const name = await resolver.getName(address);
