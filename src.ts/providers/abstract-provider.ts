@@ -57,6 +57,7 @@ import type {
     PreparedTransactionRequest, Provider, ProviderEvent,
     TransactionRequest
 } from "./provider.js";
+import { ClustersResolver } from "./clusters-resolver.js";
 
 type Timer = ReturnType<typeof setTimeout>;
 
@@ -1178,12 +1179,14 @@ export class AbstractProvider implements Provider {
         });
     }
 
-    async getResolver(name: string): Promise<null | EnsResolver> {
-        return await EnsResolver.fromName(this, name);
+    async getResolver(name: string): Promise<null | EnsResolver | ClustersResolver> {
+        if (name.includes('/') || !name.includes('.')) return await ClustersResolver.fromName(this, name);
+        else return await EnsResolver.fromName(this, name);
     }
 
     async getAvatar(name: string): Promise<null | string> {
         const resolver = await this.getResolver(name);
+        if (resolver instanceof ClustersResolver) return null;
         if (resolver) { return await resolver.getAvatar(); }
         return null;
     }
@@ -1198,6 +1201,14 @@ export class AbstractProvider implements Provider {
         address = getAddress(address);
         const node = namehash(address.substring(2).toLowerCase() + ".addr.reverse");
 
+        try {
+            const resolver = await ClustersResolver.fromName(this, '');
+            const name = await resolver.getName(address);
+            if (name !== null) return name;
+        } catch (error) {
+            console.log(`Error looking up address using Clusters: ${error}`);
+        }
+        
         try {
 
             const ensAddr = await EnsResolver.getEnsAddress(this);
